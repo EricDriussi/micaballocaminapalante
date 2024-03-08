@@ -1,6 +1,5 @@
 package com.leanmind.avoidexceptions
 
-import com.leanmind.avoidexceptions.UserRole.ADMIN
 import org.springframework.stereotype.Service
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -19,15 +18,13 @@ class UserService(private val userRepository: UserRepository) {
             if (user.isAdmin() && cannotExistsMoreAdmins()) {
                 return CreateUserResult.tooManyAdminsError()
             }
-            userRepository.save(user)
-            logger.log(Level.INFO, "User created.")
-            return CreateUserResult.success()
-        } catch (exception: UserAlreadyExistsException) {
-            logger.log(Level.WARNING, "User already exists.", exception)
-            throw exception
-        } catch (exception: TooManyAdminsException) {
-            logger.log(Level.WARNING, "Too many admins.", exception)
-            throw exception
+            val repoResult = userRepository.save(user)
+            if (repoResult.isError()) {
+                logger.log(Level.SEVERE, "Cannot create user.")
+            } else {
+                logger.log(Level.INFO, "User created.")
+            }
+            return repoResult
         } catch (exception: Exception) {
             logger.log(Level.SEVERE, "Cannot create user.", exception)
             throw CannotCreateUserException(exception)

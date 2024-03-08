@@ -14,13 +14,13 @@ class UserRepository {
         return users.find { it.username == username }
     }
 
-    fun save(user: User) {
-        try {
+    fun save(user: User): CreateUserResult {
+        return try {
             users.add(user)
+            CreateUserResult.success()
         } catch (exception: Exception) {
-            throw CannotPersistUserException(exception)
+            CreateUserResult.cannotPersistUserError()
         }
-
     }
 
     fun countOfAdmins(): Int {

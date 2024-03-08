@@ -3,12 +3,17 @@ package com.leanmind.avoidexceptions
 open class Error
 class UserAlreadyExistsError : Error()
 class TooManyAdminsError : Error()
+class CannotPersistError : Error()
 
 class CreateUserResult private constructor(
         val error: Error?,
 ) {
     fun isSuccess(): Boolean {
         return error === null
+    }
+
+    fun isError(): Boolean {
+        return error !== null
     }
 
     companion object {
@@ -22,6 +27,10 @@ class CreateUserResult private constructor(
 
         fun tooManyAdminsError(): CreateUserResult {
             return CreateUserResult(TooManyAdminsError())
+        }
+
+        fun cannotPersistUserError(): CreateUserResult {
+            return CreateUserResult(CannotPersistError())
         }
     }
 }
